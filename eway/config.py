@@ -29,6 +29,10 @@ EWAY_PAYMENT_LIVE_AUTH_COMPLETE_TESTING_MODE = 'https://www.eway.com.au/gateway/
 EWAY_PAYMENT_LIVE_AUTH_VOID = 'https://www.eway.com.au/gateway/xmlauthvoid.asp'
 EWAY_PAYMENT_LIVE_AUTH_VOID_TESTING_MODE = 'https://www.eway.com.au/gateway/xmltest/authvoidtestpage.asp'
 
+EWAY_PAYMENT_LIVE_REFUND = 'https://www.eway.com.au/gateway/xmlpaymentrefund.asp'
+EWAY_PAYMENT_SANDBOX_REFUND = 'https://sandbox.myeway.com.au/gateway/xmlpaymentrefund.asp'
+
+
 CUSTOMER_ID = "87654321"    # Set this to your eWAY Customer ID
 PAYMENT_METHOD = REAL_TIME  # Set this to the payment gatway you would like to use (REAL_TIME, REAL_TIME_CVN or GEO_IP_ANTI_FRAUD)
 USE_LIVE = False # Set this to true to use the live gateway

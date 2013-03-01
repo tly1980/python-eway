@@ -6,7 +6,7 @@ from httplib2 import Http
 from urllib import urlencode, quote_plus
 
 from eway import config
-from eway.fields import Payment, Customer, Response
+from eway.fields import Payment, Customer, Response, Refund
 
 class EwayPaymentError(Exception): pass
     
@@ -18,10 +18,11 @@ class EwayPaymentClient(object):
     def __init__(self, customer_id=config.EWAY_DEFAULT_CUSTOMER_ID, 
                        method=config.EWAY_DEFAULT_PAYMENT_METHOD, 
                        live_gateway=config.EWAY_DEFAULT_LIVE_GATEWAY,
+                       refund_password=None,
                        pre_auth=False):
         
         self.customer_id = customer_id
-        
+        self.refund_password = refund_password
         # FIXME: Clean up
         if method == config.REAL_TIME:
             if live_gateway:
@@ -174,7 +175,38 @@ class EwayPaymentClient(object):
 
         request_data = self.build_request(data)
         return self.send_transaction(gateway_url, request_data)
-    
+
+    def refund(self, amount, original_transaction_number, reference=None, expiry_month="", expiry_year=""):
+        """
+        Void an existing authorisation
+
+        @param amount: The amount to void.
+        """
+        if self.gateway_url == config.EWAY_PAYMENT_LIVE_REAL_TIME or self.gateway_url == config.EWAY_PAYMENT_LIVE_REAL_TIME_CVN:
+            gateway_url = config.EWAY_PAYMENT_LIVE_REFUND
+        elif self.gateway_url == config.EWAY_PAYMENT_LIVE_REAL_TIME_TESTING_MODE or self.gateway_url == config.EWAY_PAYMENT_LIVE_REAL_TIME_CVN_TESTING_MODE:
+            gateway_url = config.EWAY_PAYMENT_SANDBOX_REFUND
+        else:
+            raise EwayPaymentError('Could not determine complete method: refund')
+
+        refund = Refund(total_amount=amount,
+                    original_transaction_number=original_transaction_number,
+                    refund_password=self.refund_password,
+                )
+
+        data = refund.get_data()
+        if reference:
+            data['ewayCustomerInvoiceRef'] = reference
+
+        # this two are not required fields, but these two xml elements
+        # are required to show up in request
+        # empty field will help the transaction proceed
+        data['ewayCardExpiryMonth'] = expiry_month
+        data['ewayCardExpiryYear'] = expiry_year
+
+        request_data = self.build_request(data)
+        return self.send_transaction(gateway_url, request_data)
+
     def build_request(self, data):
         root = ET.Element("ewaygateway")
         customer_element = ET.Element("ewayCustomerID")
@@ -209,4 +241,3 @@ class EwayPaymentClient(object):
         response = Response()
         response.parse(content)
         return response
-
