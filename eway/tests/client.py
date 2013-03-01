@@ -8,6 +8,7 @@ from eway import config
 from eway.client import EwayPaymentClient
 from eway.fields import Customer, CreditCard
 
+
 class ClientTestCase(unittest.TestCase):
     def setUp(self):
         self.eway_client = EwayPaymentClient('87654321',

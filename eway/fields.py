@@ -163,3 +163,13 @@ class Payment(Validator):
     option1 = Field("ewayOption1", default="")
     option2 = Field("ewayOption2", default="")
     option3 = Field("ewayOption3", default="")
+
+
+class Refund(Validator):
+    total_amount = CentsField("ewayTotalAmount", "Total Amount")
+    original_transaction_number = Field("ewayOriginalTrxnNumber", "Original Transaction Number")
+    refund_password = Field("ewayRefundPassword", "Refund Password")
+    # Magic Variables
+    option1 = Field("ewayOption1", default="")
+    option2 = Field("ewayOption2", default="")
+    option3 = Field("ewayOption3", default="")
